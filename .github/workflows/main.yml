@@ -19,14 +19,22 @@ jobs:
     runs-on: macOS-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v2
-      - uses: r-lib/actions/setup-r@v1
-      - uses: r-lib/actions/setup-pandoc@v1
-      - name: Check Hands_on_III.Rmd
-        run: if [ -e Hands_on_III.Rmd ] ; then exit 0 ; else { echo missing Hands_on_III.Rmd ; exit 1 ; } ; fi
-      - name: Install rmarkdown
-        run: Rscript -e 'install.packages("rmarkdown")'
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.5.2'
+      - uses: r-lib/actions/setup-pandoc@v2
+      - name: Check Hands_on_III.ipynb
+        run: if [ -e Hands_on_III.ipynb ] ; then exit 0 ; else { echo missing Hands_on_III.ipynb ; exit 1 ; } ; fi
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Jupyter
+        run: python -m pip install jupyter
+      - name: Set up quarto
+        uses: quarto-dev/quarto-actions/setup@v2
       - name: Render Hands_on_III.html
-        run: Rscript -e 'rmarkdown::render("Hands_on_III.Rmd")'
+        run: quarto render Hands_on_III.ipynb --to html --embed-resources
       - name: Check Hands_on_III.html
         run: if [ -e Hands_on_III.html ] ; then exit 0 ; else { echo missing Hands_on_III.html ; exit 1 ; } ; fi
